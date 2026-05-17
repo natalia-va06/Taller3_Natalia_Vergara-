@@ -1,0 +1,26 @@
+import os
+import cv2
+import numpy as np
+import pandas as pd
+import pydicom
+
+
+class ProcesadorDICOM:
+    
+
+    def __init__(self, carpeta_dicom, carpeta_salida):
+        self.carpeta_dicom = carpeta_dicom
+        self.carpeta_salida = carpeta_salida
+        self.archivos_dicom = []
+        self.metadata = []
+
+        # Crear carpetas de salida
+        os.makedirs(
+            os.path.join(carpeta_salida, "ecualizadas"),
+            exist_ok=True
+        )
+
+        os.makedirs(
+            os.path.join(carpeta_salida, "bordes"),
+            exist_ok=True
+        )
