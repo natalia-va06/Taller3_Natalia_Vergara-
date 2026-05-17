@@ -248,25 +248,32 @@ class ProcesadorDICOM:
 
 if __name__ == "__main__":
 
-    carpeta_dicom = r"C:\Users\natal\Downloads\Taller 3\pydicom-data-master\data_store\data"
 
+    carpeta_dicom = "datos_dicom"
     carpeta_salida = "resultados"
 
-    procesador = ProcesadorDICOM(
-        carpeta_dicom,
-        carpeta_salida
-    )
+    if not os.path.exists(carpeta_dicom):
+        os.makedirs(carpeta_dicom)
+        print(f"Se ha creado la carpeta '{carpeta_dicom}' automáticamente.")
+        print(f"Por favor, coloca tus archivos .dcm dentro de ella y vuelve a ejecutar el programa.")
+    else:
 
-    procesador.cargar_dicoms()
+        procesador = ProcesadorDICOM(
+            carpeta_dicom,
+            carpeta_salida
+        )
 
-    procesador.extraer_metadatos()
+        procesador.cargar_dicoms()
+        
+        if len(procesador.archivos_dicom) > 0:
+            procesador.extraer_metadatos()
+            procesador.procesar_imagenes()
 
-    procesador.procesar_imagenes()
+            df = procesador.crear_dataframe()
+            print("\n DATAFRAME \n")
+            print(df)
 
-    df = procesador.crear_dataframe()
-
-    print("\n DATAFRAME \n")
-
-    print(df)
-
-    procesador.exportar_csv(df)
+            procesador.exportar_csv(df)
+            print(f"\n Archivo guardado en la carpeta: {os.path.abspath(carpeta_salida)}")
+        else:
+            print(f"No se encontraron archivos para procesar dentro de '{carpeta_dicom}'.")
