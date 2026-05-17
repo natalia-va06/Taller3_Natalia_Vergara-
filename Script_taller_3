@@ -14,7 +14,7 @@ class ProcesadorDICOM:
         self.archivos_dicom = []
         self.metadata = []
 
-        # Crear carpetas de salida
+    
         os.makedirs(
             os.path.join(carpeta_salida, "ecualizadas"),
             exist_ok=True
@@ -24,3 +24,127 @@ class ProcesadorDICOM:
             os.path.join(carpeta_salida, "bordes"),
             exist_ok=True
         )
+    def cargar_dicoms(self):
+
+        if not os.path.exists(self.carpeta_dicom):
+
+            print("La carpeta no existe")
+
+            return
+
+        archivos = os.listdir(self.carpeta_dicom)
+
+        print("Archivos encontrados:")
+        print(archivos)
+
+        for archivo in archivos:
+
+            ruta = os.path.join(
+                self.carpeta_dicom,
+                archivo
+            )
+
+  
+            if os.path.isdir(ruta):
+                continue
+
+            try:
+
+                dicom = pydicom.dcmread(ruta)
+
+                self.archivos_dicom.append(
+                    (archivo, dicom)
+                )
+
+                print(f"[OK] DICOM cargado: {archivo}")
+
+            except Exception as e:
+
+                print(f"[ERROR] {archivo}: {e}")
+
+
+    def extraer_metadatos(self):
+
+        for nombre_archivo, dicom in self.archivos_dicom:
+
+            try:
+
+                datos = {
+
+                    "Archivo": nombre_archivo,
+
+                    "IDPaciente":
+                        getattr(dicom, "PatientID", "No disponible"),
+
+                    "Nombrepaciente":
+                        str(getattr(
+                            dicom,
+                            "Nombrepaciente",
+                            "No disponible"
+                        )),
+
+                    "ID estudio":
+                        getattr(
+                            dicom,
+                            "ID estudio",
+                            "No disponible"
+                        ),
+
+                    "descripcion estudio":
+                        getattr(
+                            dicom,
+                            "descripcion estudio",
+                            "No disponible"
+                        ),
+
+                    "Fecha estudio":
+                        getattr(
+                            dicom,
+                            "Fecha estudio",
+                            "No disponible"
+                        ),
+
+                    "Modalidad":
+                        getattr(
+                            dicom,
+                            "Modalidad",
+                            "No disponible"
+                        ),
+
+                    "filas":
+                        getattr(
+                            dicom,
+                            "filas",
+                            "No disponible"
+                        ),
+
+                    "Columnas":
+                        getattr(
+                            dicom,
+                            "Columnas",
+                            "No disponible"
+                        )
+                }
+
+                try:
+
+                    imagen = dicom.pixel_array.astype(np.float32)
+
+                    intensidad_promedio = np.mean(imagen)
+
+                    datos["IntensidadPromedio"] = \
+                        round(float(intensidad_promedio), 2)
+
+                except Exception:
+
+                    datos["IntensidadPromedio"] = \
+                        "Sin imagen"
+
+                self.metadata.append(datos)
+
+            except Exception as e:
+
+                print(
+                    f"Error extrayendo metadata "
+                    f"de {nombre_archivo}: {e}"
+                )
