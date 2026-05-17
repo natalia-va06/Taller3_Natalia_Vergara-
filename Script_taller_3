@@ -248,16 +248,14 @@ class ProcesadorDICOM:
 
 if __name__ == "__main__":
 
-
-    carpeta_dicom = "datos_dicom"
+    carpeta_dicom = "data"
     carpeta_salida = "resultados"
 
     if not os.path.exists(carpeta_dicom):
-        os.makedirs(carpeta_dicom)
-        print(f"Se ha creado la carpeta '{carpeta_dicom}' automáticamente.")
-        print(f"Por favor, coloca tus archivos .dcm dentro de ella y vuelve a ejecutar el programa.")
+        print(f"No se encuentra la carpeta '{carpeta_dicom}' al lado de este archivo de Python.")
+        print("Asegúrate de haber movido o copiado la carpeta de datos a este mismo directorio.")
     else:
-
+  
         procesador = ProcesadorDICOM(
             carpeta_dicom,
             carpeta_salida
@@ -270,10 +268,10 @@ if __name__ == "__main__":
             procesador.procesar_imagenes()
 
             df = procesador.crear_dataframe()
-            print("\n DATAFRAME \n")
+            print("\nDATAFRAME\n")
             print(df)
 
             procesador.exportar_csv(df)
-            print(f"\n Archivo guardado en la carpeta: {os.path.abspath(carpeta_salida)}")
+            print(f"\nLos resultados se guardaron en la carpeta: {os.path.abspath(carpeta_salida)}")
         else:
-            print(f"No se encontraron archivos para procesar dentro de '{carpeta_dicom}'.")
+            print(f" No se encontraron archivos legibles dentro de la carpeta '{carpeta_dicom}'.")
