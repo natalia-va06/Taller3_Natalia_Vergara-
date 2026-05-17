@@ -148,3 +148,86 @@ class ProcesadorDICOM:
                     f"Error extrayendo metadata "
                     f"de {nombre_archivo}: {e}"
                 )
+    def procesar_imagenes(self):
+
+        for nombre_archivo, dicom in self.archivos_dicom:
+
+            try:
+
+                imagen = dicom.pixel_array
+
+
+                imagen_norm = cv2.normalize(
+                    imagen,
+                    None,
+                    0,
+                    255,
+                    cv2.NORM_MINMAX
+                )
+
+                imagen_norm = np.uint8(imagen_norm)
+
+                if len(imagen_norm.shape) == 3:
+
+                    imagen_norm = cv2.cvtColor(
+        imagen_norm,
+        cv2.COLOR_BGR2GRAY
+    )
+
+
+                ecualizada = cv2.equalizeHist(
+    imagen_norm
+)
+
+
+
+                bordes = cv2.Canny(
+                    ecualizada,
+                    50,
+                    150
+                )
+
+
+                nombre_base = os.path.splitext(
+                    nombre_archivo
+                )[0]
+
+                ruta_ecualizada = os.path.join(
+                    self.carpeta_salida,
+                    "ecualizadas",
+                    f"{nombre_base}_eq.png"
+                )
+
+                ruta_bordes = os.path.join(
+                    self.carpeta_salida,
+                    "bordes",
+                    f"{nombre_base}_bordes.png"
+                )
+
+                cv2.imwrite(
+                    ruta_ecualizada,
+                    ecualizada
+                )
+
+                cv2.imwrite(
+                    ruta_bordes,
+                    bordes
+                )
+
+                print(
+                    f"[OK] Procesada: {nombre_archivo}"
+                )
+
+            except Exception as e:
+
+                print(
+                    f"[ERROR] Procesando "
+                    f"{nombre_archivo}: {e}"
+                )
+
+
+    def crear_dataframe(self):
+
+        df = pd.DataFrame(self.metadata)
+
+        return df
