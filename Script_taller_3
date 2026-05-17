@@ -231,3 +231,42 @@ class ProcesadorDICOM:
         df = pd.DataFrame(self.metadata)
 
         return df
+    def exportar_csv(self, df):
+
+        ruta_csv = os.path.join(
+            self.carpeta_salida,
+            "metadata_dicom.csv"
+        )
+
+        df.to_csv(
+            ruta_csv,
+            index=False
+        )
+
+        print(f" CSV guardado en: {ruta_csv}")
+
+
+if __name__ == "__main__":
+
+    carpeta_dicom = r"C:\Users\natal\Downloads\Taller 3\pydicom-data-master\data_store\data"
+
+    carpeta_salida = "resultados"
+
+    procesador = ProcesadorDICOM(
+        carpeta_dicom,
+        carpeta_salida
+    )
+
+    procesador.cargar_dicoms()
+
+    procesador.extraer_metadatos()
+
+    procesador.procesar_imagenes()
+
+    df = procesador.crear_dataframe()
+
+    print("\n DATAFRAME \n")
+
+    print(df)
+
+    procesador.exportar_csv(df)
